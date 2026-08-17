@@ -1,0 +1,411 @@
+import { useState,useRef } from 'react'
+import html2pdf from "html2pdf.js";
+import './App.css'
+
+function App() {
+  const resumeRef = useRef();
+  const [showForm, setShowForm] = useState(false)
+  const [showResume, setShowResume] = useState(false)
+  const [isGenerating, setIsGenerating] = useState(false)
+
+  const [resumeData, setResumeData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    location: '',
+    summary: '',
+    education: '',
+    skills: '',
+    experience: '',
+    projects: ''
+  })
+
+  const handleChange = (e) => {
+    setResumeData({
+      ...resumeData,
+      [e.target.name]: e.target.value
+    })
+  }
+const calculateATSScore = () => {
+  let score = 0;
+
+  if (resumeData.name.trim()) score += 10;
+  if (resumeData.email.trim()) score += 10;
+  if (resumeData.phone.trim()) score += 10;
+  if (resumeData.summary.trim()) score += 10;
+  if (resumeData.education.trim()) score += 10;
+  if (resumeData.skills.trim()) score += 15;
+  if (resumeData.experience.trim()) score += 15;
+  if (resumeData.projects.trim()) score += 10;
+
+  return score;
+};
+ const generateResume = async () => {
+  if (isGenerating) return;
+   if (!/^[a-zA-Z\s]+$/.test(resumeData.name.trim())) {
+  alert("Please enter a valid name.");
+  return;
+}
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(resumeData.email.trim())) {
+  alert("Please enter a valid email address.");
+  return;
+}
+
+if (!/^\d{10}$/.test(resumeData.phone.trim())) {
+  alert("Please enter a valid 10-digit phone number.");
+  return;
+}
+
+  try {
+    setIsGenerating(true);
+
+    const response = await fetch("http://localhost:5000/api/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(resumeData),
+    });
+
+    const data = await response.json();
+
+    console.log("Backend response:", data);
+
+    if (data.success) {
+      setResumeData(data.data);
+      setShowResume(true);
+    } else {
+      alert(data.message || "Something went wrong.");
+    }
+  } catch (error) {
+    console.error("Backend error:", error);
+    alert("Cannot connect to backend.");
+  } finally {
+    setIsGenerating(false);
+  }
+};
+  const downloadPDF = () => {
+  const element = resumeRef.current;
+
+  if (!element) return;
+
+  const options = {
+    margin: 0,
+    filename: `${resumeData.name || "resume"}.pdf`,
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: {
+      unit: "mm",
+      format: "a4",
+      orientation: "portrait",
+    },
+  };
+
+  html2pdf().set(options).from(element).save();
+};
+
+  return (
+    <div className="app">
+
+      {/* LANDING PAGE */}
+      {!showForm && !showResume && (
+        <>
+          <nav className="navbar">
+            <div className="logo">AI Resume Builder</div>
+
+            <button
+              className="nav-button"
+              onClick={() => setShowForm(true)}
+            >
+              Get Started
+            </button>
+          </nav>
+
+          <main className="hero">
+
+            <div className="badge">
+              ✨ AI-Powered Resume Builder
+            </div>
+
+            <h1>
+              Build a Resume That
+              <span> Gets You Hired</span>
+            </h1>
+
+            <p>
+              Create a professional, ATS-friendly resume in minutes.
+              Let AI improve your content and make your experience stand out.
+            </p>
+
+            <button
+              className="hero-button"
+              onClick={() => setShowForm(true)}
+            >
+              Build My Resume →
+            </button>
+
+            <div className="features">
+
+              <div className="feature-card">
+                <div className="icon">🤖</div>
+                <h3>AI Powered</h3>
+                <p>
+                  Improve your resume content with intelligent AI suggestions.
+                </p>
+              </div>
+
+              <div className="feature-card">
+                <div className="icon">📄</div>
+                <h3>Professional Templates</h3>
+                <p>
+                  Choose from clean and modern resume templates.
+                </p>
+              </div>
+
+              <div className="feature-card">
+                <div className="icon">⚡</div>
+                <h3>Quick & Easy</h3>
+                <p>
+                  Build your complete resume in just a few minutes.
+                </p>
+              </div>
+
+            </div>
+
+          </main>
+        </>
+      )}
+
+      {/* RESUME FORM */}
+      {showForm && !showResume && (
+        <main className="form-page">
+
+          <div className="form-header">
+
+            <button
+              className="back-button"
+              onClick={() => setShowForm(false)}
+            >
+              ← Back
+            </button>
+
+            <h1>Build Your Resume</h1>
+
+            <p>
+              Enter your information and we'll create your professional resume.
+            </p>
+
+          </div>
+
+          <div className="resume-form">
+
+            <h2>Personal Information</h2>
+
+            <div className="form-grid">
+
+              <div className="form-group">
+                <label>Full Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={resumeData.name}
+                  onChange={handleChange}
+                  placeholder="Enter your full name"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={resumeData.email}
+                  onChange={handleChange}
+                  placeholder="your@email.com"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Phone</label>
+                <input
+                  type="text"
+                  name="phone"
+                  value={resumeData.phone}
+                  onChange={handleChange}
+                  inputMode="numeric"
+                  placeholder="9876543210"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Location</label>
+                <input
+                  type="text"
+                  name="location"
+                  value={resumeData.location}
+                  onChange={handleChange}
+                  placeholder="City, Country"
+                />
+              </div>
+
+            </div>
+
+            <div className="form-group">
+              <label>Professional Summary</label>
+
+              <textarea
+                name="summary"
+                value={resumeData.summary}
+                onChange={handleChange}
+                rows="5"
+                placeholder="Write a short summary about yourself..."
+              ></textarea>
+            </div>
+
+            <h2>Education</h2>
+
+            <div className="form-group">
+              <label>Education Details</label>
+
+              <textarea
+                name="education"
+                value={resumeData.education}
+                onChange={handleChange}
+                rows="4"
+                placeholder="Example: B.Tech in Artificial Intelligence and Data Science, XYZ College, 2024-2028"
+              ></textarea>
+            </div>
+
+            <h2>Skills</h2>
+
+            <div className="form-group">
+              <label>Your Skills</label>
+
+              <input
+                type="text"
+                name="skills"
+                value={resumeData.skills}
+                onChange={handleChange}
+                placeholder="Python, SQL, Machine Learning, React..."
+              />
+            </div>
+
+            <h2>Experience</h2>
+
+            <div className="form-group">
+              <label>Work Experience</label>
+
+              <textarea
+                name="experience"
+                value={resumeData.experience}
+                onChange={handleChange}
+                rows="5"
+                placeholder="Describe your work experience..."
+              ></textarea>
+            </div>
+
+            <h2>Projects</h2>
+
+            <div className="form-group">
+              <label>Projects</label>
+
+              <textarea
+                name="projects"
+                value={resumeData.projects}
+                onChange={handleChange}
+                rows="5"
+                placeholder="Describe your projects..."
+              ></textarea>
+            </div>
+
+            <button
+              className="generate-button"
+  onClick={generateResume}
+  disabled={isGenerating}
+>
+  {isGenerating ? "⏳ Generating Resume..." : "✨ Generate Resume"}
+            </button>
+
+          </div>
+
+        </main>
+      )}
+
+      {/* RESUME PREVIEW */}
+      {showResume && (
+        <main className="preview-page">
+
+          <div className="preview-actions">
+
+            <button
+              className="back-button"
+              onClick={() => setShowResume(false)}
+            >
+              ← Edit Resume
+            </button>
+
+          </div>
+          <button className="download-button" onClick={downloadPDF}>
+           Download PDF
+          </button>
+          
+          <div className="resume-preview" ref={resumeRef}>
+              
+              <header className="resume-header">
+
+              <h1>{resumeData.name || 'Your Name'}</h1>
+
+              <p>
+                {resumeData.email}
+                {resumeData.phone && ` • ${resumeData.phone}`}
+                {resumeData.location && ` • ${resumeData.location}`}
+              </p>
+
+            </header>
+
+            {resumeData.summary && (
+              <section>
+                <h2>PROFESSIONAL SUMMARY</h2>
+                <p>{resumeData.summary}</p>
+              </section>
+            )}
+
+            {resumeData.education && (
+              <section>
+                <h2>EDUCATION</h2>
+                <p>{resumeData.education}</p>
+              </section>
+            )}
+
+            {resumeData.skills && (
+              <section>
+                <h2>SKILLS</h2>
+                <p>{resumeData.skills}</p>
+              </section>
+            )}
+
+            {resumeData.experience && (
+              <section>
+                <h2>EXPERIENCE</h2>
+                <p>{resumeData.experience}</p>
+              </section>
+            )}
+
+            {resumeData.projects && (
+              <section>
+                <h2>PROJECTS</h2>
+                <p>{resumeData.projects}</p>
+              </section>
+            )}
+
+          </div>
+
+        </main>
+      )}
+
+    </div>
+  )
+}
+
+export default App 
