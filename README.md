@@ -1,28 +1,34 @@
-# AI Resume Builder 🚀
+# # AI Resume Builder 🚀
 
-An AI-powered resume builder that helps users create professional, ATS-friendly resumes quickly and easily.
+An AI-powered resume builder that helps users create professional, ATS-friendly resumes with AI-assisted content generation, job-description optimization, and PDF export.
 
-The application allows users to enter their personal, educational, skills, experience, and project information, generate/improve resume content using AI, preview the resume, and export the final resume as a PDF.
+## 🌐 Live Demo
+
+👉 https://ai-resume-builder-1-imt7.onrender.com
+
+## 📂 GitHub Repository
+
+👉 https://github.com/AdarshD546/AI-Resume-Builder
 
 ---
 
 ## ✨ Features
 
-- 📝 Easy-to-use resume creation form
 - 🤖 AI-powered resume content generation
-- ✨ AI-assisted professional summary generation
-- 🎯 ATS-friendly resume structure
+- 🎯 ATS-friendly resume optimization
+- 📊 Job-description and keyword matching
+- 📝 Structured resume creation
 - 👀 Live resume preview
-- 📄 PDF resume export
-- 📱 Responsive user interface
-- 🔐 Environment variable support for API keys
-- 💻 Separate frontend and backend architecture
+- 📄 Professional PDF export
+- 🔐 Secure API key handling with environment variables
+- 🌐 Fully deployed frontend and backend
 
 ---
 
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - React
 - Vite
 - JavaScript
@@ -31,30 +37,33 @@ The application allows users to enter their personal, educational, skills, exper
 - html2pdf.js
 
 ### Backend
+
 - Node.js
 - Express.js
 - REST API
 
 ### AI
-- AI API integration for generating and improving resume content
 
-### Development Tools
-- Visual Studio Code
+- Google Gemini API
+
+### Deployment & Tools
+
 - Git
 - GitHub
-- npm
+- Render
+- Visual Studio Code
 
 ---
 
-## 📂 Project Structure
+## 📁 Project Structure
 
 ```text
 AI-Resume-Builder/
 │
 ├── backend/
-│   ├── server.js
 │   ├── package.json
-│   └── package-lock.json
+│   ├── package-lock.json
+│   └── server.js
 │
 ├── frontend/
 │   ├── public/
@@ -68,4 +77,4 @@ AI-Resume-Builder/
 │   └── vite.config.js
 │
 ├── .gitignore
-└──
+└── README.md
